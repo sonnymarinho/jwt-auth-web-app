@@ -1,6 +1,8 @@
 import { createContext, useContext, useState } from 'react';
 import Router from 'next/router';
 import { api } from '../services/api';
+import { setCookie } from 'nookies';
+import { DEFAULT_COOKIE_OPTIONS } from '../config/cookie';
 
 type User = {
   email: string;
@@ -37,9 +39,17 @@ function AuthProvider({ children }: AuthProviderProps) {
         password,
       });
 
-      const { permissions, roles } = data;
+      const { permissions, roles, refreshToken, token } = data;
 
-      setUser({ email, permissions, roles });
+      setUser({
+        email,
+        permissions,
+        roles,
+      });
+
+      setCookie(undefined, '@jwt-auth-web-app:token', token, DEFAULT_COOKIE_OPTIONS);
+
+      setCookie(undefined, '@jwt-auth-web-app:refreshToken', refreshToken, DEFAULT_COOKIE_OPTIONS);
 
       Router.push('/dashboard');
     } catch (error) {
