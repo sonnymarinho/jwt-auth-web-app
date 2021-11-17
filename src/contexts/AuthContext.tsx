@@ -1,8 +1,8 @@
-import { createContext, useContext, useState } from 'react';
 import Router from 'next/router';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { CookieKeys } from '../config/cookie';
 import { api } from '../services/api';
-import { setCookie } from 'nookies';
-import { DEFAULT_COOKIE_OPTIONS } from '../config/cookie';
+import { getCookie, setCookie } from '../utils/cookies';
 
 type User = {
   email: string;
@@ -28,6 +28,18 @@ interface AuthProviderProps {
 }
 
 function AuthProvider({ children }: AuthProviderProps) {
+  useEffect(() => {
+    const token = getCookie(CookieKeys.TOKEN);
+
+    if (token) {
+      api.get('/me').then(response => {
+        const { email, permissions, roles } = response.data;
+
+        setUser({ email, permissions, roles });
+      });
+    }
+  }, []);
+
   const [user, setUser] = useState<User>();
 
   const isAuthenticated = !!user;
@@ -41,15 +53,12 @@ function AuthProvider({ children }: AuthProviderProps) {
 
       const { permissions, roles, refreshToken, token } = data;
 
-      setUser({
-        email,
-        permissions,
-        roles,
-      });
+      setUser({ email, permissions, roles });
 
-      setCookie(undefined, '@jwt-auth-web-app:token', token, DEFAULT_COOKIE_OPTIONS);
+      setCookie({ name: CookieKeys.TOKEN, value: token });
+      setCookie({ name: CookieKeys.REFRESH_TOKEN, value: refreshToken });
 
-      setCookie(undefined, '@jwt-auth-web-app:refreshToken', refreshToken, DEFAULT_COOKIE_OPTIONS);
+      (api.defaults.headers as any)['Authorization'] = `Bearer ${token}`;
 
       Router.push('/dashboard');
     } catch (error) {
