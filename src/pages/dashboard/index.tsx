@@ -6,7 +6,10 @@ export default function Dashboard() {
   const { user } = useAuth();
 
   useEffect(() => {
-    api.get('/me').then(response => console.log('dashboard', response.data));
+    api
+      .get('/me')
+      .then(response => console.info(response.data))
+      .catch(error => console.error(error));
   }, []);
 
   return (
