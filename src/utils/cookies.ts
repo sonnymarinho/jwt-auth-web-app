@@ -5,10 +5,10 @@ import { DEFAULT_COOKIE_OPTIONS } from '../config/cookie';
 
 const APPLICATION_NAME = 'jwt-auth-web-app';
 
-const getKey = (key: string) => `@${APPLICATION_NAME}:${key}`;
+const getCookieKey = (key: string) => `@${APPLICATION_NAME}:${key}`;
 
-export const getCookie = (name: string) => {
-  return parseCookies()[getKey(name)];
+export const getCookie = (name: string, ctx?: next.GetServerSidePropsContext) => {
+  return parseCookies(ctx)[getCookieKey(name)];
 };
 
 interface setCookieProps {
@@ -26,9 +26,9 @@ interface setCookieProps {
 }
 
 export const setCookie = ({ ctx, name, value, options }: setCookieProps) => {
-  setNookie(ctx, getKey(name), value, { ...DEFAULT_COOKIE_OPTIONS, ...options });
+  setNookie(ctx, getCookieKey(name), value, { ...DEFAULT_COOKIE_OPTIONS, ...options });
 };
 
 export const destroyCookie = (name: string) => {
-  destroyNookie(undefined, getKey(name));
+  destroyNookie(undefined, getCookieKey(name));
 };

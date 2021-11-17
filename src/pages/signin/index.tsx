@@ -1,10 +1,10 @@
-import type { NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
 import { FormEvent, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 
 import styles from './styles.module.css';
 
-const Signin: NextPage = () => {
+export const Signin: NextPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
