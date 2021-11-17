@@ -2,7 +2,7 @@ import Router from 'next/router';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { CookieKeys } from '../config/cookie';
 import { api } from '../services/api';
-import { getCookie, setCookie } from '../utils/cookies';
+import { destroyCookie, getCookie, setCookie } from '../utils/cookies';
 
 type User = {
   email: string;
@@ -27,16 +27,28 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+export function signOut() {
+  destroyCookie(CookieKeys.TOKEN);
+  destroyCookie(CookieKeys.REFRESH_TOKEN);
+
+  (api.defaults.headers as any)['Authorization'] = '';
+
+  Router.push('/');
+}
+
 function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const token = getCookie(CookieKeys.TOKEN);
 
     if (token) {
-      api.get('/me').then(response => {
-        const { email, permissions, roles } = response.data;
+      api
+        .get('/me')
+        .then(response => {
+          const { email, permissions, roles } = response.data;
 
-        setUser({ email, permissions, roles });
-      });
+          setUser({ email, permissions, roles });
+        })
+        .catch(() => signOut());
     }
   }, []);
 

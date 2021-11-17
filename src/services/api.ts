@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { CookieKeys } from '../config/cookie';
 import { HttpStatus } from '../config/httpSatus';
+import { signOut } from '../contexts/AuthContext';
 import { getCookie, setCookie } from '../utils/cookies';
 
 export const api = axios.create({
@@ -63,6 +64,7 @@ api.interceptors.response.use(
           });
         });
       } else {
+        signOut();
       }
     }
 
