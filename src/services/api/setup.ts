@@ -4,6 +4,7 @@ import { CookieKeys } from '../../config/cookie';
 import { HttpStatus } from '../../config/httpSatus';
 import { signOut } from '../../contexts/AuthContext';
 import { getCookie, setCookie } from '../../utils/cookies';
+import { AuthTokenError } from '../errors/AuthTokenError';
 
 let isRefreshing = false;
 let failedRequestsQueue: any[] = [];
@@ -69,6 +70,8 @@ export const setupAPIClient = (ctx: GetServerSidePropsContext | undefined = unde
             });
           });
         } else {
+          if (!process.browser) return Promise.reject(new AuthTokenError());
+
           signOut();
         }
       }

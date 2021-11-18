@@ -29,6 +29,6 @@ export const setCookie = ({ ctx, name, value, options }: setCookieProps) => {
   setNookie(ctx, getCookieKey(name), value, { ...DEFAULT_COOKIE_OPTIONS, ...options });
 };
 
-export const destroyCookie = (name: string) => {
-  destroyNookie(undefined, getCookieKey(name));
+export const destroyCookie = (name: string, ctx?: GetServerSidePropsContext) => {
+  destroyNookie(ctx, getCookieKey(name));
 };

@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from 'next';
 import Router from 'next/router';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { CookieKeys } from '../config/cookie';
@@ -27,12 +28,14 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export function signOut() {
-  if (process.browser) {
-    destroyCookie(CookieKeys.TOKEN);
-    destroyCookie(CookieKeys.REFRESH_TOKEN);
+export function destroyAuthCookies(ctx?: GetServerSidePropsContext) {
+  destroyCookie(CookieKeys.TOKEN, ctx);
+  destroyCookie(CookieKeys.REFRESH_TOKEN, ctx);
+}
 
-    (api.defaults.headers as any)['Authorization'] = '';
+export function signOut(ctx?: GetServerSidePropsContext) {
+  if (process.browser) {
+    destroyAuthCookies(ctx);
 
     Router.push('/');
   }
