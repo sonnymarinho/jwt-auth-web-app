@@ -28,12 +28,14 @@ interface AuthProviderProps {
 }
 
 export function signOut() {
-  destroyCookie(CookieKeys.TOKEN);
-  destroyCookie(CookieKeys.REFRESH_TOKEN);
+  if (process.browser) {
+    destroyCookie(CookieKeys.TOKEN);
+    destroyCookie(CookieKeys.REFRESH_TOKEN);
 
-  (api.defaults.headers as any)['Authorization'] = '';
+    (api.defaults.headers as any)['Authorization'] = '';
 
-  Router.push('/');
+    Router.push('/');
+  }
 }
 
 function AuthProvider({ children }: AuthProviderProps) {
@@ -43,7 +45,7 @@ function AuthProvider({ children }: AuthProviderProps) {
     if (token) {
       api
         .get('/me')
-        .then(response => {
+        .then((response: any) => {
           const { email, permissions, roles } = response.data;
 
           setUser({ email, permissions, roles });
